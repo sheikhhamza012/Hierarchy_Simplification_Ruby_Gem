@@ -4,11 +4,14 @@ require 'rubyXL/convenience_methods'
 
 class HierarchySimplification
   def self.generate_files(file_path)
+    puts "reading file..."
     input = RubyXL::Parser.parse(file_path)
     nodes = []
     parents = []
     levels = []
-    input[0].drop(1).each do |row| 
+    puts "finding parents"
+    input[0].drop(1).each_with_index do |row,row_index| 
+        puts "parent of row"+(row_index+1).to_s
         i=row.size-1
         while i>0 do
             if row[i].value.nil?
@@ -47,24 +50,32 @@ class HierarchySimplification
     worksheet.add_cell(0, 1, 'area_parent') 
     worksheet.add_cell(0, 2, 'Nivel') 
     worksheet.add_cell(0, 3, 'new_name') 
+    puts "writing to parents.xlsx"
     nodes.each_with_index do |n,i|
         worksheet.add_cell(i+1, 0, n) 
         worksheet.add_cell(i+1, 1, parents[i]) 
         worksheet.add_cell(i+1, 2, levels[i]) 
     end
     worksbook.write("parents.xlsx")
-
-    input[0].each do |row| 
-      i=row.size-1
-      while i>0 do
-          if !row[i].value.nil?
-              row[row.size-1].change_contents(row[i].value.to_s,row[row.size-1].formula)
-              break
-          end
-          i-=1;
-      end
+    
+    puts "initiating second file..."
+    input[0].drop(1).each_with_index do |row,row_index| 
+        puts "analysing row: "+(row_index+1).to_s
+        i=row.size-1
+        while i>0 do
+            if !row[i].value.nil?
+                if row[input[0][0].size-1].nil?
+                    input[0].add_cell(row_index+1,input[0][0].size-1,row[i].value)
+                else
+                    row[input[0][0].size-1].change_contents(row[i].value)
+                end
+                break
+            end
+            i-=1;
+        end
     end
-    input.write(file_path)
+    puts "writing file..."
+    input.write("file3.xlsx")
 
   end
 end
