@@ -4,7 +4,7 @@ require 'rubyXL/convenience_methods'
 
 class HierarchySimplification
   def self.generate_files(file_path)
-    input = RubyXL::Parser.parse("file2.xlsx")
+    input = RubyXL::Parser.parse(file_path)
     nodes = []
     parents = []
     levels = []
@@ -64,7 +64,7 @@ class HierarchySimplification
           i-=1;
       end
     end
-    input.write("file2.xlsx")
+    input.write(file_path)
 
   end
 end
